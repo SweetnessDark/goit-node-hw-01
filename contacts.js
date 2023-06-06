@@ -3,7 +3,7 @@ const path = require("node:path");
 
 const contactsPath = path.resolve("db", "contacts.json");
 
-const listContacts = async () => {
+async function listContacts() {
   try {
     const listContactResult = await fs
       .readFile(contactsPath)
@@ -14,9 +14,9 @@ const listContacts = async () => {
   } catch (error) {
     console.log("error :>> ", error);
   }
-};
+}
 
-const getContactById = async (contactId) => {
+async function getContactById(contactId) {
   try {
     const contactIdResult = await fs
       .readFile(contactsPath)
@@ -31,9 +31,9 @@ const getContactById = async (contactId) => {
   } catch (error) {
     console.log("error :>> ", error);
   }
-};
+}
 
-const removeContact = async (contactId) => {
+async function removeContact(contactId) {
   try {
     const removeContactsResult = await fs
       .readFile(contactsPath)
@@ -56,9 +56,9 @@ const removeContact = async (contactId) => {
   } catch (error) {
     console.log("error :>> ", error);
   }
-};
+}
 
-const addContact = async (name, email, phone) => {
+async function addContact(name, email, phone) {
   try {
     const contactAddResult = await fs
       .readFile(contactsPath)
@@ -86,6 +86,6 @@ const addContact = async (name, email, phone) => {
   } catch (error) {
     console.log("error :>> ", error);
   }
-};
+}
 
 module.exports = { listContacts, getContactById, removeContact, addContact };
