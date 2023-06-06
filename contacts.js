@@ -1,16 +1,13 @@
 const fs = require("fs").promises;
 const path = require("node:path");
 
-const contactsPath = path.resolve("db", "contacts.json");
+const contactsPath = path.join(__dirname, "./db/contacts.json");
 
 async function listContacts() {
   try {
-    const listContactResult = await fs
-      .readFile(contactsPath)
-      .then((data) => console.table(JSON.parse(data)))
-      .catch((error) => console.log(error.message));
+    const data = await fs.readFile(contactsPath);
 
-    return listContactResult;
+    return JSON.parse(data);
   } catch (error) {
     console.log("error :>> ", error);
   }
@@ -18,16 +15,9 @@ async function listContacts() {
 
 async function getContactById(contactId) {
   try {
-    const contactIdResult = await fs
-      .readFile(contactsPath)
-      .then((data) => JSON.parse(data))
-      .then((contacts) =>
-        contacts.filter((contact) => contact.id === contactId)
-      )
-      .then((contact) => console.table(contact))
-      .catch((error) => console.log(error.message));
-
-    return contactIdResult;
+    const allContacts = await listContacts();
+    const data = allContacts.filter((item) => item.id === contactId);
+    return data || null;
   } catch (error) {
     console.log("error :>> ", error);
   }
@@ -35,54 +25,22 @@ async function getContactById(contactId) {
 
 async function removeContact(contactId) {
   try {
-    const removeContactsResult = await fs
-      .readFile(contactsPath)
-      .then((data) => JSON.parse(data))
-      .then((contacts) =>
-        contacts.filter((contact) => contact.id !== contactId)
-      )
-      .then((filtredContacts) => {
-        console.table(filtredContacts);
-        return filtredContacts;
-      })
-      .then((filtredContacts) => {
-        fs.writeFile(
-          contactsPath,
-          JSON.stringify(filtredContacts, null, 4)
-        ).catch((error) => console.log(error.message));
-      });
-
-    return removeContactsResult;
+    const allContacts = await listContacts();
+    const index = allContacts.filter((item) => item.id !== contactId);
+    await fs.writeFile(contactsPath, JSON.stringify(allContacts, null, 4));
+    return index;
   } catch (error) {
     console.log("error :>> ", error);
   }
 }
 
-async function addContact(name, email, phone) {
+async function addContact(data) {
   try {
-    const contactAddResult = await fs
-      .readFile(contactsPath)
-      .then((data) => JSON.parse(data))
-      .then((contacts) => {
-        contacts.push({
-          id: (contacts.length + 1).toString(),
-          name,
-          email,
-          phone,
-        });
-        return contacts;
-      })
-      .then((newContacts) => {
-        console.table(newContacts);
-        return newContacts;
-      })
-      .then((newContacts) => {
-        fs.writeFile(contactsPath, JSON.stringify(newContacts, null, 4)).catch(
-          (error) => console.log(error.message)
-        );
-      });
-
-    return contactAddResult;
+    const allContacts = await listContacts();
+    const newContact = { id: nanoid(), ...data };
+    allContacts.push(newContact);
+    await fs.writeFile(contactsPath, JSON.stringify(allContacts, null, 4));
+    return newContact;
   } catch (error) {
     console.log("error :>> ", error);
   }
